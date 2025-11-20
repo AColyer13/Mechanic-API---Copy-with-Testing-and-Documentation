@@ -35,7 +35,7 @@ A comprehensive RESTful API for managing a mechanic shop built with Flask using 
 - **Rate Limiting**: Flask-Limiter (configurable per endpoint)
 - **Caching**: Flask-Caching (in-memory with 5-minute TTL)
 - **Database Migrations**: Flask-Migrate with Alembic
-- **Testing**: pytest with 90+ automated test cases
+- **Testing**: unittest with 90+ automated test cases
 - **API Testing**: Postman collection with 40+ requests
 
 ## Advanced Features
@@ -153,7 +153,16 @@ If you can't activate the virtual environment due to execution policy, use the P
 ### Running Tests
 To verify your installation, run the automated test suite:
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/ -v
+.venv\Scripts\python.exe -m unittest discover tests
+```
+
+Alternatively, use the provided test script:
+```bash
+# On Windows (PowerShell/CMD)
+.\run_tests.bat
+
+# On Linux/Mac or Git Bash
+./run_tests.sh
 ```
 
 ## Project Structure
@@ -195,6 +204,8 @@ To verify your installation, run the automated test suite:
 ├── config.py                           # Configuration settings
 ├── requirements.txt                    # Python dependencies
 ├── client.py                           # Interactive CLI client
+├── run_tests.bat                       # Test execution script for Windows (unittest discover)
+├── run_tests.sh                        # Test execution script for Linux/Mac (unittest discover)
 ├── Mechanic API.postman_collection.json # Postman collection (40+ requests)
 └── README.md                           # This file
 ```
@@ -508,30 +519,30 @@ The project includes a **comprehensive automated test suite** with **90+ test ca
 
 #### Run All Tests
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/
+.venv\Scripts\python.exe -m unittest discover tests
 ```
 
 #### Run Specific Test File
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/test_customers.py
-.venv\Scripts\python.exe -m pytest tests/test_mechanics.py
-.venv\Scripts\python.exe -m pytest tests/test_inventory.py
-.venv\Scripts\python.exe -m pytest tests/test_service_tickets.py
+.venv\Scripts\python.exe -m unittest tests.test_customers
+.venv\Scripts\python.exe -m unittest tests.test_mechanics
+.venv\Scripts\python.exe -m unittest tests.test_inventory
+.venv\Scripts\python.exe -m unittest tests.test_service_tickets
 ```
 
 #### Run with Verbose Output
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/ -v
+.venv\Scripts\python.exe -m unittest discover tests -v
 ```
 
-#### Run with Coverage Report
+#### Run Specific Test Class
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/ --cov=application --cov-report=html
+.venv\Scripts\python.exe -m unittest tests.test_customers.TestCustomerEndpoints
 ```
 
-#### Run Specific Test
+#### Run Specific Test Method
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/test_customers.py::TestCustomerEndpoints::test_customer_login_success -v
+.venv\Scripts\python.exe -m unittest tests.test_customers.TestCustomerEndpoints.test_customer_login_success -v
 ```
 
 ### Test Features
@@ -548,8 +559,7 @@ The project includes a **comprehensive automated test suite** with **90+ test ca
 ### Test Dependencies
 
 Required packages (already in `requirements.txt`):
-- `pytest` - Test framework
-- `pytest-cov` - Coverage reporting
+- `unittest` - Built-in Python test framework
 - `flask-testing` - Flask test utilities
 
 ## Development Notes

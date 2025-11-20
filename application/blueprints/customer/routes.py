@@ -128,7 +128,7 @@ def get_my_tickets(customer_id):
     summary: Get my service tickets
     description: Retrieve all service tickets for the authenticated customer (requires Bearer token)
     security:
-      - Bearer: []
+      - bearerAuth: []
     responses:
       200:
         description: List of customer's service tickets
@@ -418,7 +418,7 @@ def update_customer(authenticated_customer_id, customer_id):
     summary: Update customer account
     description: Update customer information (requires Bearer token, customers can only update their own account)
     security:
-      - Bearer: []
+      - bearerAuth: []
     parameters:
       - in: path
         name: customer_id
@@ -516,7 +516,7 @@ def delete_customer(authenticated_customer_id, customer_id):
     summary: Delete customer account
     description: Delete a customer account (requires Bearer token, customers can only delete their own account)
     security:
-      - Bearer: []
+      - bearerAuth: []
     parameters:
       - in: path
         name: customer_id
