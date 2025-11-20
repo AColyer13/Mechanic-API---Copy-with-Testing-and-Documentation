@@ -1,6 +1,7 @@
 """Tests for mechanic endpoints."""
 
 import json
+import unittest
 from datetime import date
 from tests.base_test import BaseTestCase
 from application.models import Mechanic, ServiceTicket, Customer

@@ -35,6 +35,7 @@ A comprehensive RESTful API for managing a mechanic shop built with Flask using 
 - **Rate Limiting**: Flask-Limiter (configurable per endpoint)
 - **Caching**: Flask-Caching (in-memory with 5-minute TTL)
 - **Database Migrations**: Flask-Migrate with Alembic
+- **Testing**: pytest with 90+ automated test cases
 - **API Testing**: Postman collection with 40+ requests
 
 ## Advanced Features
@@ -148,8 +149,12 @@ If you can't activate the virtual environment due to execution policy, use the P
 ```powershell
 .venv\Scripts\python.exe app.py
 ```
-- **Data Validation**: Comprehensive input validation using Marshmallow schemas
-- **Modular Architecture**: Clean separation using Flask blueprints
+
+### Running Tests
+To verify your installation, run the automated test suite:
+```powershell
+.venv\Scripts\python.exe -m pytest tests/ -v
+```
 
 ## Project Structure
 
@@ -176,55 +181,32 @@ If you can't activate the virtual environment due to execution policy, use the P
 │           ├── __init__.py             # Inventory blueprint
 │           ├── routes.py               # CRUD operations
 │           └── schemas.py              # Inventory schemas
+├── /tests
+│   ├── __init__.py                     # Tests package
+│   ├── base_test.py                    # Base test case with fixtures
+│   ├── test_customers.py               # Customer endpoint tests (18 tests)
+│   ├── test_mechanics.py               # Mechanic endpoint tests (15 tests)
+│   ├── test_inventory.py               # Inventory endpoint tests (19 tests)
+│   └── test_service_tickets.py         # Service ticket tests (25 tests)
+├── /instance                           # Instance folder for database
+├── /static
+│   └── swagger.yaml                    # API documentation
 ├── app.py                              # Application entry point
 ├── config.py                           # Configuration settings
 ├── requirements.txt                    # Python dependencies
 ├── client.py                           # Interactive CLI client
-├── test_api.py                         # Automated test script
 ├── Mechanic API.postman_collection.json # Postman collection (40+ requests)
-└── TESTING_GUIDE.md                    # Comprehensive testing documentation
+└── README.md                           # This file
 ```
-
-## Setup Instructions
-
-1. **Clone or download the project**
-
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   # or
-   source venv/bin/activate  # macOS/Linux
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   copy .env.example .env
-   # Edit .env file with your configuration
-   ```
-
-5. **Run the application**
-   ```bash
-   python app.py
-   ```
-
-The API will be available at `http://localhost:5000`
 
 ## API Endpoints
 
-### Authentication (`/customers`)
-- `POST /customers/login` - Login and receive JWT token
-- `GET /customers/my-tickets` - Get authenticated customer's tickets (requires token)
-
 ### Customers (`/customers`)
 - `POST /customers/` - Create new customer (includes password hashing) [Rate Limited: 10/min]
+- `POST /customers/login` - Login and receive JWT token
 - `GET /customers/` - Get all customers [Cached: 5 min]
 - `GET /customers/<id>` - Get specific customer
+- `GET /customers/my-tickets` - Get authenticated customer's tickets (requires token)
 - `PUT /customers/<id>` - Update customer (requires token, own account only)
 - `DELETE /customers/<id>` - Delete customer (requires token, own account only)
 
@@ -254,13 +236,13 @@ The API will be available at `http://localhost:5000`
 - `PUT /inventory/<id>` - Update inventory part
 - `DELETE /inventory/<id>` - Delete inventory part
 
-## Sample API Usage
+## API Usage Examples
 
 ### Authentication Flow
 
 #### 1. Create a Customer (with password)
-```bash
-curl -X POST http://localhost:5000/customers/ \
+```powershell
+curl -X POST http://127.0.0.1:5000/customers/ \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "John",
@@ -273,8 +255,8 @@ curl -X POST http://localhost:5000/customers/ \
 ```
 
 #### 2. Login and Get JWT Token
-```bash
-curl -X POST http://localhost:5000/customers/login \
+```powershell
+curl -X POST http://127.0.0.1:5000/customers/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john.doe@email.com",
@@ -292,14 +274,14 @@ Response:
 ```
 
 #### 3. Access Protected Route
-```bash
-curl -X GET http://localhost:5000/customers/my-tickets \
+```powershell
+curl -X GET http://127.0.0.1:5000/customers/my-tickets \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
 ### Create a Mechanic
-```bash
-curl -X POST http://localhost:5000/mechanics/ \
+```powershell
+curl -X POST http://127.0.0.1:5000/mechanics/ \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Mike",
@@ -313,8 +295,8 @@ curl -X POST http://localhost:5000/mechanics/ \
 ```
 
 ### Create a Service Ticket
-```bash
-curl -X POST http://localhost:5000/service-tickets/ \
+```powershell
+curl -X POST http://127.0.0.1:5000/service-tickets/ \
   -H "Content-Type: application/json" \
   -d '{
     "customer_id": 1,
@@ -328,13 +310,13 @@ curl -X POST http://localhost:5000/service-tickets/ \
 ```
 
 ### Assign Mechanic to Service Ticket
-```bash
-curl -X PUT http://localhost:5000/service-tickets/1/assign-mechanic/1
+```powershell
+curl -X PUT http://127.0.0.1:5000/service-tickets/1/assign-mechanic/1
 ```
 
 ### Create Inventory Part
-```bash
-curl -X POST http://localhost:5000/inventory/ \
+```powershell
+curl -X POST http://127.0.0.1:5000/inventory/ \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Oil Filter",
@@ -343,8 +325,8 @@ curl -X POST http://localhost:5000/inventory/ \
 ```
 
 ### Add Part to Service Ticket
-```bash
-curl -X PUT http://localhost:5000/service-tickets/1/add-part/1
+```powershell
+curl -X PUT http://127.0.0.1:5000/service-tickets/1/add-part/1
 ```
 
 ## Database Models
@@ -436,7 +418,139 @@ curl -X PUT http://localhost:5000/service-tickets/1/add-part/1
 - **Documentation**: Each request includes description
 - **Variables**: Use `{{baseUrl}}` for easy configuration
 
-See `TESTING_GUIDE.md` for detailed testing instructions.
+## Automated Unit Testing
+
+### Test Suite Overview
+
+The project includes a **comprehensive automated test suite** with **90+ test cases** covering all API endpoints, authentication, validation, and error handling.
+
+### Test Structure
+
+**Base Test Case** (`tests/base_test.py`):
+- Foundation class for all test modules
+- Automatic test database setup/teardown
+- In-memory SQLite database for fast execution
+- Helper methods for authentication headers
+
+**Test Modules**:
+- `test_customers.py` - 18 test cases (8 positive, 10 negative)
+- `test_mechanics.py` - 15 test cases (6 positive, 9 negative)
+- `test_inventory.py` - 19 test cases (7 positive, 12 negative)
+- `test_service_tickets.py` - 25 test cases (12 positive, 13 negative)
+
+### Test Coverage
+
+#### Customer Tests (18 tests)
+**Positive Tests:**
+- ✅ Create customer with password hashing
+- ✅ Customer login with JWT token generation
+- ✅ Get all customers & get by ID
+- ✅ Update customer (authenticated)
+- ✅ Delete customer (authenticated)
+- ✅ Get my tickets (protected endpoint)
+
+**Negative Tests:**
+- ❌ Missing required fields
+- ❌ Duplicate email validation
+- ❌ Invalid credentials (email/password)
+- ❌ Authentication failures (missing/invalid token)
+- ❌ Authorization failures (updating other customer's data)
+- ❌ Resource not found errors
+
+#### Mechanic Tests (15 tests)
+**Positive Tests:**
+- ✅ Create mechanic (full & minimal fields)
+- ✅ Get all mechanics & get by ID
+- ✅ Update mechanic details
+- ✅ Delete mechanic
+
+**Negative Tests:**
+- ❌ Validation errors (missing fields, invalid email)
+- ❌ Duplicate email prevention
+- ❌ Resource not found (get/update/delete)
+- ❌ Cascade protection (delete mechanic assigned to tickets)
+- ❌ Invalid data types
+
+#### Inventory Tests (19 tests)
+**Positive Tests:**
+- ✅ Create inventory parts (various prices)
+- ✅ Get all inventory & get by ID
+- ✅ Update inventory (full & partial)
+- ✅ Delete inventory
+- ✅ Handle empty inventory list
+
+**Negative Tests:**
+- ❌ Missing required fields (name/price)
+- ❌ Invalid price formats & values
+- ❌ Resource not found errors
+- ❌ Cascade protection (delete parts used in tickets)
+- ❌ Empty/zero value validation
+
+#### Service Ticket Tests (25 tests)
+**Positive Tests:**
+- ✅ Create service ticket with customer
+- ✅ Get all tickets & get by ID
+- ✅ Update ticket details
+- ✅ Auto-timestamp on completion
+- ✅ Delete ticket
+- ✅ Assign/remove mechanics
+- ✅ Add inventory parts
+- ✅ Query tickets by customer/mechanic
+
+**Negative Tests:**
+- ❌ Missing required fields
+- ❌ Invalid customer ID
+- ❌ Resource not found (tickets/mechanics/parts)
+- ❌ Duplicate assignments (mechanic/part already assigned)
+- ❌ Invalid operations (remove unassigned mechanic)
+
+### Running Tests
+
+#### Run All Tests
+```powershell
+.venv\Scripts\python.exe -m pytest tests/
+```
+
+#### Run Specific Test File
+```powershell
+.venv\Scripts\python.exe -m pytest tests/test_customers.py
+.venv\Scripts\python.exe -m pytest tests/test_mechanics.py
+.venv\Scripts\python.exe -m pytest tests/test_inventory.py
+.venv\Scripts\python.exe -m pytest tests/test_service_tickets.py
+```
+
+#### Run with Verbose Output
+```powershell
+.venv\Scripts\python.exe -m pytest tests/ -v
+```
+
+#### Run with Coverage Report
+```powershell
+.venv\Scripts\python.exe -m pytest tests/ --cov=application --cov-report=html
+```
+
+#### Run Specific Test
+```powershell
+.venv\Scripts\python.exe -m pytest tests/test_customers.py::TestCustomerEndpoints::test_customer_login_success -v
+```
+
+### Test Features
+
+- **Database Isolation**: Each test runs in a clean environment
+- **Helper Methods**: Reusable test data creation functions
+- **Authentication Testing**: JWT token generation and validation
+- **Authorization Testing**: Customer-specific access control
+- **Validation Testing**: Required fields, data types, constraints
+- **Relationship Testing**: Many-to-many relationships, cascade protections
+- **Edge Case Coverage**: Empty values, boundary conditions, duplicates
+- **Error Response Validation**: Proper HTTP status codes and error messages
+
+### Test Dependencies
+
+Required packages (already in `requirements.txt`):
+- `pytest` - Test framework
+- `pytest-cov` - Coverage reporting
+- `flask-testing` - Flask test utilities
 
 ## Development Notes
 
