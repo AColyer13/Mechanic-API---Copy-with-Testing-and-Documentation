@@ -12,5 +12,6 @@ Flask-Caching==2.1.0
 python-jose==3.3.0
 passlib==1.7.4
 bcrypt==4.1.2
+flasgger==0.9.7.1
 flask-swagger==0.2.14
 flask-swagger-ui==4.11.1
