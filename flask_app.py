@@ -2,7 +2,7 @@ from application import create_app
 import os
 
 # Get configuration environment, default to production for Render
-config_name = os.environ.get('FLASK_ENV', 'ProductionConfig')
+config_name = os.environ.get('FLASK_ENV', 'production')
 
 # Create the Flask app
 app = create_app(config_name)
