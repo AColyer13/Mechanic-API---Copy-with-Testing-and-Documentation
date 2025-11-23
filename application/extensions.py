@@ -22,7 +22,6 @@ limiter = Limiter(
 cache = Cache()
 
 # JWT Token Functions
-SECRET_KEY = "your-secret-key-change-in-production"
 ALGORITHM = "HS256"
 TOKEN_EXPIRATION_HOURS = 24
 
@@ -42,7 +41,7 @@ def encode_token(customer_id):
         'sub': customer_id
     }
     
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm=ALGORITHM)
 
 def token_required(f):
     """
@@ -68,7 +67,7 @@ def token_required(f):
         
         try:
             # Decode the token
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=[ALGORITHM])
             customer_id = payload['sub']
         except JWTError as e:
             return jsonify({'message': f'Token is invalid: {str(e)}'}), 401
