@@ -530,19 +530,23 @@ Required packages (already in `requirements.txt`):
 - **Marshmallow**: Data serialization, deserialization, and validation
 
 ### Security Implementations
-- **Password Hashing**: How Password Hashing Works
-When You Create an Account:
-You enter password: "mypassword123"
-Bcrypt scrambles it: $2b$12$KIXcr4fF7v.rN8qZ5V8P5.eWJxH4KqN7yZ...
-API stores only the scrambled version in database
-Original password is thrown away - never stored
-When You Log In:
-You enter password: "mypassword123" again
-API retrieves the scrambled version from database
-Here's the magic: Bcrypt scrambles your entered password again using the same method
-It compares: Does newly scrambled password match the stored scrambled version?
-✅ Match = Correct password, you're logged in
-❌ No match = Wrong password, access denied
+
+- **Password Hashing**: Bcrypt with automatic salt generation
+  - Passwords are never stored in plain text
+  - One-way hashing means passwords cannot be reversed or decrypted
+  - Each password gets a unique salt, making identical passwords have different hashes
+  - Login verification compares newly hashed input against stored hash
+
 - **JWT Tokens**: 24-hour expiration, HS256 signing
+  - Secure authentication tokens issued after successful login
+  - Tokens expire after 24 hours for security
+  - Digitally signed to prevent tampering or forgery
+  
 - **Token Validation**: Middleware decorator for protected routes
+  - Automatic verification of token authenticity before accessing protected endpoints
+  - Rejects expired, invalid, or missing tokens with 401 Unauthorized
+  
 - **Authorization**: Customer-specific access control
+  - Customers can only view and modify their own data
+  - Token contains customer ID to enforce ownership rules
+  - Prevents unauthorized access to other customers' information
