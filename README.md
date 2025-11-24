@@ -166,48 +166,6 @@ Automatic cleanup of related data to maintain referential integrity:
 - Cleaner database
 - Prevents data inconsistencies
 
-## Local Development Setup (Optional)
-
-**Note**: The API is already live at the URL above. This section is only needed if you want to run a local development copy.
-
-### Prerequisites
-- Python 3.8 or higher
-- MySQL 8.0 or higher
-- pip (Python package manager)
-
-### Installation
-
-1. **Navigate to the project directory**
-   ```powershell
-   cd "path/to/Mechanic API"
-   ```
-
-2. **Create and configure MySQL database**
-   ```sql
-   CREATE DATABASE mechanicshopdata;
-   ```
-
-3. **Configure environment variables**
-   Create a `.env` file in the project root:
-   ```properties
-   FLASK_ENV=development
-   SECRET_KEY=dev-secret-key-change-in-production
-   DATABASE_URL=mysql+mysqlconnector://root:password@localhost/mechanicshopdata
-   DEBUG=True
-   ```
-
-4. **Install dependencies using the virtual environment**
-   ```powershell
-   .venv\Scripts\python.exe -m pip install -r requirements.txt
-   ```
-
-5. **Run the application locally**
-   ```powershell
-   .venv\Scripts\python.exe flask_app.py
-   ```
-
-The local development API will be available at `http://127.0.0.1:5000`
-
 ## Using the Interactive Client (Optional)
 
 Test the API using the included Python CLI client configured for production.
