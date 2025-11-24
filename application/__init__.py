@@ -1,6 +1,7 @@
 """Application factory for the Mechanic Shop API."""
 
 from flask import Flask
+from flask_cors import CORS
 from config import config
 from application.extensions import db, ma, migrate, limiter, cache
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -23,6 +24,15 @@ def create_app(config_name='development'):
     
     # Load configuration
     app.config.from_object(config[config_name])
+    
+    # Enable CORS for all routes
+    CORS(app, resources={
+        r"/*": {
+            "origins": "*",  # Change to your specific domain in production
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
     
     # Add caching configuration
     app.config['CACHE_TYPE'] = 'SimpleCache'

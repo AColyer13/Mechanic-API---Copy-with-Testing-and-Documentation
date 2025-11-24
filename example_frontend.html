@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanic Shop - Customer Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .api-url {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .api-url input {
+            width: 400px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .customer-card {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .customer-card h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .customer-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 3px 0;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Mechanic Shop API Demo</h1>
+        <div class="api-url">
+            <label for="apiUrl">API URL:</label>
+            <input type="text" id="apiUrl" value="https://mechanic-api-copy-with-testing-and.onrender.com" 
+                   placeholder="https://mechanic-api-copy-with-testing-and.onrender.com">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('customers')">Customers</button>
+            <button class="tab" onclick="switchTab('mechanics')">Mechanics</button>
+            <button class="tab" onclick="switchTab('inventory')">Inventory</button>
+            <button class="tab" onclick="switchTab('tickets')">Service Tickets</button>
+        </div>
+        
+        <!-- Customers Tab -->
+        <div id="customers-tab" class="tab-content active">
+            <div class="section">
+                <h2>View All Customers</h2>
+                <button onclick="getAllCustomers()">Get All Customers</button>
+                <div id="customers-list" class="results"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Add New Customer</h2>
+                <div class="form-group">
+                    <label for="customerName">Name:</label>
+                    <input type="text" id="customerName" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email:</label>
+                    <input type="email" id="customerEmail" placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Phone:</label>
+                    <input type="tel" id="customerPhone" placeholder="555-1234">
+                </div>
+                <button onclick="addCustomer()">Add Customer</button>
+                <div id="add-customer-result"></div>
+            </div>
+        </div>
+        
+        <!-- Mechanics Tab -->
+        <div id="mechanics-tab" class="tab-content">
+            <div class="section">
+                <h2>View All Mechanics</h2>
+                <button onclick="getAllMechanics()">Get All Mechanics</button>
+                <div id="mechanics-list" class="results"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Add New Mechanic</h2>
+                <div class="form-group">
+                    <label for="mechanicName">Name:</label>
+                    <input type="text" id="mechanicName" placeholder="Mike Smith">
+                </div>
+                <div class="form-group">
+                    <label for="mechanicEmail">Email:</label>
+                    <input type="email" id="mechanicEmail" placeholder="mike@mechanic.com">
+                </div>
+                <div class="form-group">
+                    <label for="mechanicPhone">Phone:</label>
+                    <input type="tel" id="mechanicPhone" placeholder="555-5678">
+                </div>
+                <div class="form-group">
+                    <label for="mechanicSalary">Salary:</label>
+                    <input type="number" id="mechanicSalary" placeholder="50000">
+                </div>
+                <button onclick="addMechanic()">Add Mechanic</button>
+                <div id="add-mechanic-result"></div>
+            </div>
+        </div>
+        
+        <!-- Inventory Tab -->
+        <div id="inventory-tab" class="tab-content">
+            <div class="section">
+                <h2>View Inventory</h2>
+                <button onclick="getAllInventory()">Get All Items</button>
+                <div id="inventory-list" class="results"></div>
+            </div>
+        </div>
+        
+        <!-- Service Tickets Tab -->
+        <div id="tickets-tab" class="tab-content">
+            <div class="section">
+                <h2>View Service Tickets</h2>
+                <button onclick="getAllTickets()">Get All Tickets</button>
+                <div id="tickets-list" class="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get the API base URL
+        function getApiUrl() {
+            return document.getElementById('apiUrl').value;
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ===== CUSTOMER FUNCTIONS =====
+        async function getAllCustomers() {
+            const resultDiv = document.getElementById('customers-list');
+            resultDiv.innerHTML = '<div class="loading">Loading customers...</div>';
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/customers`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p>No customers found.</p>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach(customer => {
+                    html += `
+                        <div class="customer-card">
+                            <h3>${customer.customer_name}</h3>
+                            <p>📧 Email: ${customer.email}</p>
+                            <p>📱 Phone: ${customer.phone}</p>
+                            <p>🆔 Customer ID: ${customer.customer_id}</p>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}<br>Make sure your API URL is correct and CORS is enabled!</div>`;
+            }
+        }
+
+        async function addCustomer() {
+            const resultDiv = document.getElementById('add-customer-result');
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            
+            if (!name || !email || !phone) {
+                resultDiv.innerHTML = '<div class="error">Please fill in all fields!</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/customers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customer_name: name,
+                        email: email,
+                        phone: phone
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="success">Customer added successfully! ID: ${data.customer_id}</div>`;
+                
+                // Clear form
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerEmail').value = '';
+                document.getElementById('customerPhone').value = '';
+                
+                // Refresh customer list
+                setTimeout(() => getAllCustomers(), 1000);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // ===== MECHANIC FUNCTIONS =====
+        async function getAllMechanics() {
+            const resultDiv = document.getElementById('mechanics-list');
+            resultDiv.innerHTML = '<div class="loading">Loading mechanics...</div>';
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/mechanics`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p>No mechanics found.</p>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach(mechanic => {
+                    html += `
+                        <div class="customer-card">
+                            <h3>${mechanic.mechanic_name}</h3>
+                            <p>📧 Email: ${mechanic.email}</p>
+                            <p>📱 Phone: ${mechanic.phone}</p>
+                            <p>💰 Salary: $${mechanic.salary}</p>
+                            <p>🆔 Mechanic ID: ${mechanic.mechanic_id}</p>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function addMechanic() {
+            const resultDiv = document.getElementById('add-mechanic-result');
+            const name = document.getElementById('mechanicName').value;
+            const email = document.getElementById('mechanicEmail').value;
+            const phone = document.getElementById('mechanicPhone').value;
+            const salary = document.getElementById('mechanicSalary').value;
+            
+            if (!name || !email || !phone || !salary) {
+                resultDiv.innerHTML = '<div class="error">Please fill in all fields!</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/mechanics`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mechanic_name: name,
+                        email: email,
+                        phone: phone,
+                        salary: parseFloat(salary)
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="success">Mechanic added successfully! ID: ${data.mechanic_id}</div>`;
+                
+                // Clear form
+                document.getElementById('mechanicName').value = '';
+                document.getElementById('mechanicEmail').value = '';
+                document.getElementById('mechanicPhone').value = '';
+                document.getElementById('mechanicSalary').value = '';
+                
+                // Refresh mechanic list
+                setTimeout(() => getAllMechanics(), 1000);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // ===== INVENTORY FUNCTIONS =====
+        async function getAllInventory() {
+            const resultDiv = document.getElementById('inventory-list');
+            resultDiv.innerHTML = '<div class="loading">Loading inventory...</div>';
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/inventory`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p>No inventory items found.</p>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach(item => {
+                    html += `
+                        <div class="customer-card">
+                            <h3>${item.part_name}</h3>
+                            <p>📦 Quantity: ${item.quantity}</p>
+                            <p>💲 Price: $${item.price}</p>
+                            <p>🆔 Part ID: ${item.part_id}</p>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // ===== SERVICE TICKET FUNCTIONS =====
+        async function getAllTickets() {
+            const resultDiv = document.getElementById('tickets-list');
+            resultDiv.innerHTML = '<div class="loading">Loading service tickets...</div>';
+            
+            try {
+                const response = await fetch(`${getApiUrl()}/service-tickets`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p>No service tickets found.</p>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach(ticket => {
+                    html += `
+                        <div class="customer-card">
+                            <h3>Ticket #${ticket.ticket_id}</h3>
+                            <p>🚗 Vehicle: ${ticket.vehicle_year} ${ticket.vehicle_make} ${ticket.vehicle_model}</p>
+                            <p>📝 Description: ${ticket.description}</p>
+                            <p>📅 Date: ${new Date(ticket.date_received).toLocaleDateString()}</p>
+                            <p>👤 Customer ID: ${ticket.customer_id}</p>
+                            ${ticket.mechanic_id ? `<p>🔧 Mechanic ID: ${ticket.mechanic_id}</p>` : ''}
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
