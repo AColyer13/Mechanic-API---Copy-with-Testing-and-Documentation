@@ -28,7 +28,38 @@ Access the live API programmatically:
 #### 3️⃣ Use API Testing Tools
 - **Postman**: Import `Mechanic API.postman_collection.json` and use the live base URL
 - **cURL**: Make requests from the command line (examples below)
-- **Python**: Use any HTTP library (requests, httpx, etc.)
+- **Python CLI Client**: Run `client.py` for interactive testing
+- **GitHub Actions**: The project uses Github Actions for continuous integration and deployment with an automated 3-stage pipeline:
+
+## CI/CD Pipeline Workflow
+
+#### 1. **Build** (Runs on every push/PR)
+- Checks out the latest code from the repository
+- Sets up Python 3.12 environment
+- Creates a virtual environment for dependency isolation
+- Installs all project dependencies from `requirements.txt`
+- Performs debugging diagnostics (Python version, directory structure, installed packages)
+
+#### 2. **Test** (Runs after successful build)
+- Sets up fresh Python 3.12 environment
+- Reinstalls dependencies to ensure clean test environment
+- Executes full test suite: `python -m unittest discover -s tests -p 'test_*.py'`
+- Runs **90+ automated unit tests** covering all endpoints, authentication, validation, and error handling
+- Uses in-memory SQLite database for isolated testing (no production data affected)
+- Tests fail the pipeline if any issues are detected
+
+#### 3. **Deploy** (Runs only on main branch push after tests pass)
+- Triggers automatic deployment to Render cloud platform
+- Uses secure API keys stored in GitHub Secrets
+- Sends POST request to Render's deployment API
+- Deploys updated code to production: `https://mechanic-api-copy-with-testing-and.onrender.com`
+- Does **not** clear cache for faster deployment
+
+### Triggers
+- **Push to main/master branch**: Full pipeline (build → test → deploy)
+- **Pull requests**: Build and test only (no deployment)
+
+**Repository**: [github.com/AColyer13/Mechanic-API---Copy-with-Testing-and-Documentation]
 
 ### Deployment Details
 - **Platform**: Render (Cloud hosting)
