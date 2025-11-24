@@ -2,6 +2,60 @@
 
 A comprehensive RESTful API for managing a mechanic shop built with Flask using the Application Factory Pattern. This API provides full CRUD operations for customers, mechanics, service tickets, and inventory parts, along with advanced features like JWT authentication, rate limiting, and caching.
 
+## 🚀 Live Deployment
+
+**Production URL**: [https://mechanic-api-copy-with-testing-and.onrender.com](https://mechanic-api-copy-with-testing-and.onrender.com)
+
+### Quick Start - Using the Live API
+
+The API is deployed and ready to use! You have three options:
+
+#### 1️⃣ Interactive API Documentation (Recommended)
+Visit the **Swagger UI** to test all endpoints directly in your browser:
+- **URL**: [https://mechanic-api-copy-with-testing-and.onrender.com/api/docs](https://mechanic-api-copy-with-testing-and.onrender.com/api/docs)
+- See all available endpoints
+- Test API calls with interactive forms
+- View request/response formats
+- No coding or tools required!
+
+#### 2️⃣ Direct API Endpoints
+Access the live API programmatically:
+- **Customers**: `https://mechanic-api-copy-with-testing-and.onrender.com/customers`
+- **Mechanics**: `https://mechanic-api-copy-with-testing-and.onrender.com/mechanics`
+- **Inventory**: `https://mechanic-api-copy-with-testing-and.onrender.com/inventory`
+- **Service Tickets**: `https://mechanic-api-copy-with-testing-and.onrender.com/service-tickets`
+
+#### 3️⃣ Use API Testing Tools
+- **Postman**: Import `Mechanic API.postman_collection.json` and use the live base URL
+- **cURL**: Make requests from the command line (examples below)
+- **Python**: Use any HTTP library (requests, httpx, etc.)
+
+### Deployment Details
+- **Platform**: Render (Cloud hosting)
+- **Environment**: Production
+- **Database**: MySQL (persistent storage)
+- **Always-On**: API is available 24/7
+- **HTTPS**: Secure SSL encryption enabled
+
+**Example Request:**
+```bash
+curl https://mechanic-api-copy-with-testing-and.onrender.com/customers
+```
+
+**Example Response:**
+```json
+{
+  "documentation": "/api/docs",
+  "endpoints": {
+    "customers": "/customers",
+    "inventory": "/inventory",
+    "mechanics": "/mechanics",
+    "service_tickets": "/service-tickets"
+  },
+  "message": "Welcome to Mechanic Shop API"
+}
+```
+
 ## Features
 
 ### Core Functionality
@@ -76,7 +130,9 @@ Performance optimization with automatic invalidation:
 
 Cache auto-clears on create/update/delete operations for data consistency.
 
-## Setup Instructions
+## Local Development Setup (Optional)
+
+**Note**: The API is already live at the URL above. This section is only needed if you want to run a local development copy.
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -109,16 +165,16 @@ Cache auto-clears on create/update/delete operations for data consistency.
    .venv\Scripts\python.exe -m pip install -r requirements.txt
    ```
 
-5. **Run the application**
+5. **Run the application locally**
    ```powershell
-   .venv\Scripts\python.exe app.py
+   .venv\Scripts\python.exe flask_app.py
    ```
 
-The API will be available at `http://127.0.0.1:5000`
+The local development API will be available at `http://127.0.0.1:5000`
 
 ## Using the Interactive Client
 
-The project includes an interactive command-line client for easy API testing:
+The project includes an interactive command-line client configured for the **live production API**:
 
 ```powershell
 .venv\Scripts\python.exe client.py
@@ -147,22 +203,13 @@ If you see this error, use the full path to the Python executable:
 ### PowerShell Execution Policy
 If you can't activate the virtual environment due to execution policy, use the Python executable directly:
 ```powershell
-.venv\Scripts\python.exe app.py
+.venv\Scripts\python.exe flask_app.py
 ```
 
 ### Running Tests
 To verify your installation, run the automated test suite:
 ```powershell
 .venv\Scripts\python.exe -m unittest discover tests
-```
-
-Alternatively, use the provided test script:
-```bash
-# On Windows (PowerShell/CMD)
-.\run_tests.bat
-
-# On Linux/Mac or Git Bash
-./run_tests.sh
 ```
 
 ## Project Structure
@@ -200,7 +247,7 @@ Alternatively, use the provided test script:
 ├── /instance                           # Instance folder for database
 ├── /static
 │   └── swagger.yaml                    # API documentation
-├── app.py                              # Application entry point
+├── flask_app.py                        # Application entry point
 ├── config.py                           # Configuration settings
 ├── requirements.txt                    # Python dependencies
 ├── client.py                           # Interactive CLI client
@@ -249,11 +296,13 @@ Alternatively, use the provided test script:
 
 ## API Usage Examples
 
+**Note**: All examples use the live production URL. For local development, replace with `http://127.0.0.1:5000`
+
 ### Authentication Flow
 
 #### 1. Create a Customer (with password)
-```powershell
-curl -X POST http://127.0.0.1:5000/customers/ \
+```bash
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/customers/ \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "John",
@@ -266,8 +315,8 @@ curl -X POST http://127.0.0.1:5000/customers/ \
 ```
 
 #### 2. Login and Get JWT Token
-```powershell
-curl -X POST http://127.0.0.1:5000/customers/login \
+```bash
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/customers/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john.doe@email.com",
@@ -285,14 +334,14 @@ Response:
 ```
 
 #### 3. Access Protected Route
-```powershell
-curl -X GET http://127.0.0.1:5000/customers/my-tickets \
+```bash
+curl -X GET https://mechanic-api-copy-with-testing-and.onrender.com/customers/my-tickets \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
 ### Create a Mechanic
-```powershell
-curl -X POST http://127.0.0.1:5000/mechanics/ \
+```bash
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/mechanics/ \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Mike",
@@ -306,8 +355,8 @@ curl -X POST http://127.0.0.1:5000/mechanics/ \
 ```
 
 ### Create a Service Ticket
-```powershell
-curl -X POST http://127.0.0.1:5000/service-tickets/ \
+```bash
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/service-tickets/ \
   -H "Content-Type: application/json" \
   -d '{
     "customer_id": 1,
@@ -321,13 +370,13 @@ curl -X POST http://127.0.0.1:5000/service-tickets/ \
 ```
 
 ### Assign Mechanic to Service Ticket
-```powershell
-curl -X PUT http://127.0.0.1:5000/service-tickets/1/assign-mechanic/1
+```bash
+curl -X PUT https://mechanic-api-copy-with-testing-and.onrender.com/service-tickets/1/assign-mechanic/1
 ```
 
 ### Create Inventory Part
-```powershell
-curl -X POST http://127.0.0.1:5000/inventory/ \
+```bash
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/inventory/ \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Oil Filter",
@@ -336,8 +385,8 @@ curl -X POST http://127.0.0.1:5000/inventory/ \
 ```
 
 ### Add Part to Service Ticket
-```powershell
-curl -X PUT http://127.0.0.1:5000/service-tickets/1/add-part/1
+```bash
+curl -X PUT https://mechanic-api-copy-with-testing-and.onrender.com/service-tickets/1/add-part/1
 ```
 
 ## Database Models
