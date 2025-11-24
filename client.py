@@ -4,8 +4,7 @@ This script provides a command-line interface to interact with
 the Mechanic Shop API. It allows testing all endpoints with sample data
 or custom input.
 
-Now configured to use the LIVE PRODUCTION API on Render!
-For local development, change BASE_URL to "http://127.0.0.1:5000"
+Now configured to use the LIVE PRODUCTION API on Render!"
 """
 
 import requests
