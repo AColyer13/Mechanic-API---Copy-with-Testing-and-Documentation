@@ -5,14 +5,14 @@ from application.extensions import db
 
 # Association table for many-to-many relationship between Mechanic and ServiceTicket
 mechanic_service_ticket = db.Table('mechanic_service_ticket',
-    db.Column('mechanic_id', db.Integer, db.ForeignKey('mechanic.id'), primary_key=True),
-    db.Column('service_ticket_id', db.Integer, db.ForeignKey('service_ticket.id'), primary_key=True)
+    db.Column('mechanic_id', db.Integer, db.ForeignKey('mechanic.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('service_ticket_id', db.Integer, db.ForeignKey('service_ticket.id', ondelete='CASCADE'), primary_key=True)
 )
 
 # Association table for many-to-many relationship between Inventory and ServiceTicket
 inventory_service_ticket = db.Table('inventory_service_ticket',
-    db.Column('inventory_id', db.Integer, db.ForeignKey('inventory.id'), primary_key=True),
-    db.Column('service_ticket_id', db.Integer, db.ForeignKey('service_ticket.id'), primary_key=True)
+    db.Column('inventory_id', db.Integer, db.ForeignKey('inventory.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('service_ticket_id', db.Integer, db.ForeignKey('service_ticket.id', ondelete='CASCADE'), primary_key=True)
 )
 
 class Customer(db.Model):
@@ -28,8 +28,8 @@ class Customer(db.Model):
     address = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationship to service tickets
-    service_tickets = db.relationship('ServiceTicket', backref='customer', lazy=True)
+    # Relationship to service tickets (cascade delete when customer is deleted)
+    service_tickets = db.relationship('ServiceTicket', backref='customer', lazy=True, cascade='all, delete-orphan')
 
 class Mechanic(db.Model):
     """Mechanic model."""
@@ -53,7 +53,7 @@ class ServiceTicket(db.Model):
     __tablename__ = 'service_ticket'
     
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id', ondelete='CASCADE'), nullable=False)
     vehicle_year = db.Column(db.Integer)
     vehicle_make = db.Column(db.String(50))
     vehicle_model = db.Column(db.String(50))
