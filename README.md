@@ -1,4 +1,8 @@
+
 # Mechanic Shop API
+
+[![Build Status](https://github.com/AColyer13/Mechanic-API---Copy-with-Testing-and-Documentation/actions/workflows/ci.yaml/badge.svg)](https://github.com/AColyer13/Mechanic-API---Copy-with-Testing-and-Documentation/actions)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
 A full‑featured **RESTful API** for managing a mechanic shop, built with **Flask** using the Application Factory pattern.
 
@@ -94,6 +98,12 @@ Interactive documentation with “Try it out” for every endpoint.
 
 ### Inventory (`/inventory`)
 
+**Required fields for creating an inventory item:**
+- `name` (string, required)
+- `quantity` (integer, required)
+- `price` (float, required)
+- `description` (string, optional)
+
 | Method | Endpoint                | Description              | Auth |
 |--------|-------------------------|--------------------------|------|
 | POST   | `/inventory/`           | Create inventory item    | No   |
@@ -118,7 +128,44 @@ Interactive documentation with “Try it out” for every endpoint.
 
 ---
 
-## Example cURL Commands (Live API)
+
+## Example Requests (Live API)
+
+### Customers
+### Mechanics
+```bash
+# Create mechanic
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/mechanics/ \
+  -H "Content-Type: application/json" \
+  -d '{"first_name":"Jane","last_name":"Smith","email":"jane@shop.com","phone":"555-5678","specialty":"Engine Repair","hourly_rate":85.00,"hire_date":"2023-01-15"}'
+```
+
+### Inventory
+```bash
+# Create inventory item
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/inventory/ \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Oil Filter","quantity":10,"price":12.99,"description":"Premium oil filter"}'
+```
+
+### Service Tickets
+```bash
+# Create service ticket
+curl -X POST https://mechanic-api-copy-with-testing-and.onrender.com/service-tickets/ \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id":1,"vehicle_year":2020,"vehicle_make":"Toyota","vehicle_model":"Camry","description":"Oil change needed","estimated_cost":100.00,"status":"Open"}'
+```
+## Error Handling
+
+The API uses standard HTTP status codes to indicate success or failure:
+
+- **400 Bad Request**: Missing or invalid data (e.g., required fields not provided, wrong data type)
+- **401 Unauthorized**: Missing or invalid authentication token
+- **404 Not Found**: Resource does not exist (e.g., wrong ID)
+- **409 Conflict**: Resource conflict (e.g., adding a part that is already linked)
+- **500 Internal Server Error**: Unexpected server error
+
+Error responses are returned as JSON with an `error` or `errors` field describing the problem.
 
 ```bash
 # Register
