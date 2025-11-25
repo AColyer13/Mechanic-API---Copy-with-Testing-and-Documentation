@@ -153,20 +153,49 @@ More examples are in the Postman collection.
 python -m unittest discover tests
 ```
 
-## Project Structure (Key Parts)
+## Project Structure
 
 ```
-/application
-├── __init__.py          # create_app() factory
-├── extensions.py        # db, cache, limiter, JWT
-├── models.py            # SQLAlchemy models
-└── /blueprints          # customer, mechanic, service_ticket, inventory
-/tests                   # 90+ tests
-client.py                # Interactive CLI client (uses live API)
-Mechanic API.postman_collection.json
-static/swagger.yaml
-config.py
-requirements.txt
+project-root/
+├── application/
+│   ├── __init__.py              # create_app() factory
+│   ├── extensions.py            # db, cache, limiter, JWT
+│   ├── models.py                # SQLAlchemy models
+│   ├── blueprints/
+│   │   ├── customer/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── customerSchemas.py
+│   │   ├── mechanic/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   ├── service_ticket/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   ├── inventory/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   └── ...
+│   └── static/
+│       └── swagger.yaml         # OpenAPI docs
+├── instance/
+│   └── ...                      # Instance config, e.g., SQLite DB
+├── tests/
+│   ├── __init__.py
+│   ├── base_test.py
+│   ├── test_customers.py
+│   ├── test_inventory.py
+│   ├── test_mechanics.py
+│   ├── test_service_tickets.py
+│   └── ...                      # 90+ tests
+├── client.py                    # Interactive CLI client (uses live API)
+├── Mechanic API.postman_collection.json
+├── config.py                    # App config
+├── requirements.txt             # Python dependencies
+└── README.md
 ```
 
 ## Repository & Deployment
