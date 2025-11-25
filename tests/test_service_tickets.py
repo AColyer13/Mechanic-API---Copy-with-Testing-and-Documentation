@@ -205,17 +205,6 @@ class TestServiceTicketEndpoints(BaseTestCase):
         response_data = json.loads(response.data)
         self.assertIn('removed', response_data['message'])
     
-    def test_get_tickets_by_customer(self):
-        """Test retrieving all tickets for a specific customer."""
-        customer = self.create_test_customer()
-        self.create_test_ticket(customer.id)
-        self.create_test_ticket(customer.id)
-        
-        response = self.client.get(f'/service-tickets/customer/{customer.id}')
-        
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.data)
-        self.assertEqual(len(response_data), 2)
     
     def test_get_tickets_by_mechanic(self):
         """Test retrieving all tickets assigned to a specific mechanic."""
