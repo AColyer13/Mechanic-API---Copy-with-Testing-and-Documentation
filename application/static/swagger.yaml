@@ -459,6 +459,38 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
+  /service-tickets/{ticket_id}/parts:
+    post:
+      tags:
+        - Service Tickets
+      summary: "Add multiple inventory parts to a service ticket"
+      description: "Add multiple inventory parts to a service ticket in a single request"
+      parameters:
+        - in: "path"
+          name: "ticket_id"
+          type: "integer"
+          required: true
+          description: "ID of the service ticket"
+        - in: "body"
+          name: "body"
+          description: "List of inventory part IDs to add"
+          required: true
+          schema:
+            $ref: "#/definitions/AddMultiplePartsPayload"
+      responses:
+        200:
+          description: "Parts added successfully"
+          schema:
+            $ref: "#/definitions/AddMultiplePartsResponse"
+        400:
+          description: "Invalid input data"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: "Service ticket or inventory part not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   # Inventory Endpoints
   /inventory:
     post:
@@ -910,9 +942,6 @@ definitions:
       customer_id:
         type: "integer"
         example: 1
-      mechanic_id:
-        type: "integer"
-        example: 1
       vehicle_year:
         type: "integer"
         example: 2020
@@ -937,36 +966,29 @@ definitions:
       status:
         type: "string"
         example: "Open"
+      created_at:
+        type: "string"
+        format: "date-time"
+        example: "2023-01-15T10:30:00Z"
+      completed_at:
+        type: "string"
+        format: "date-time"
+        example: null
+      customer:
+        $ref: "#/definitions/CustomerResponse"
+      mechanics:
+        type: "array"
+        items:
+          $ref: "#/definitions/MechanicResponse"
+      inventory_parts:
+        type: "array"
+        items:
+          $ref: "#/definitions/InventoryResponse"
 
   AllServiceTickets:
     type: "array"
     items:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          example: 1
-        customer_id:
-          type: "integer"
-          example: 1
-        mechanic_id:
-          type: "integer"
-          example: 1
-        vehicle_year:
-          type: "integer"
-          example: 2020
-        vehicle_make:
-          type: "string"
-          example: "Toyota"
-        vehicle_model:
-          type: "string"
-          example: "Camry"
-        description:
-          type: "string"
-          example: "Oil change and tire rotation needed"
-        status:
-          type: "string"
-          example: "Open"
+      $ref: "#/definitions/ServiceTicketResponse"
 
   # Inventory Definitions
   CreateInventoryPayload:
@@ -1032,6 +1054,35 @@ definitions:
       message:
         type: "string"
         example: "Successfully deleted"
+
+  AddMultiplePartsPayload:
+    type: "object"
+    required:
+      - inventory_ids
+    properties:
+      inventory_ids:
+        type: "array"
+        items:
+          type: "integer"
+        example: [1, 2, 3]
+        description: "List of inventory part IDs to add to the service ticket"
+
+  AddMultiplePartsResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        example: "Added 2 parts to ticket 1"
+      added_parts:
+        type: "array"
+        items:
+          type: "integer"
+        example: [1, 2]
+      already_added:
+        type: "array"
+        items:
+          type: "integer"
+        example: []
 
   ErrorResponse:
     type: "object"
