@@ -404,6 +404,63 @@ class TestServiceTicketEndpoints(BaseTestCase):
         response_data = json.loads(response.data)
         self.assertIn('already added', response_data['error'])
 
+    def test_remove_part_from_ticket(self):
+        """Test removing an inventory part from a service ticket."""
+        customer = self.create_test_customer()
+        ticket = self.create_test_ticket(customer.id)
+        inventory = self.create_test_inventory()
+        
+        # First add the part
+        self.client.put(f'/service-tickets/{ticket.id}/add-part/{inventory.id}')
+        
+        # Now remove it
+        response = self.client.put(
+            f'/service-tickets/{ticket.id}/remove-part/{inventory.id}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn('removed', response_data['message'])
+    
+    def test_remove_part_ticket_not_found(self):
+        """Test removing part from non-existent ticket."""
+        inventory = self.create_test_inventory()
+        
+        response = self.client.put(
+            f'/service-tickets/9999/remove-part/{inventory.id}'
+        )
+        
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.data)
+        self.assertIn('not found', response_data['error'])
+    
+    def test_remove_nonexistent_part_from_ticket(self):
+        """Test removing non-existent part from ticket."""
+        customer = self.create_test_customer()
+        ticket = self.create_test_ticket(customer.id)
+        
+        response = self.client.put(
+            f'/service-tickets/{ticket.id}/remove-part/9999'
+        )
+        
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.data)
+        self.assertIn('not found', response_data['error'])
+    
+    def test_remove_part_not_added(self):
+        """Test removing a part that is not added to the ticket."""
+        customer = self.create_test_customer()
+        ticket = self.create_test_ticket(customer.id)
+        inventory = self.create_test_inventory()
+        
+        response = self.client.put(
+            f'/service-tickets/{ticket.id}/remove-part/{inventory.id}'
+        )
+        
+        self.assertEqual(response.status_code, 409)
+        response_data = json.loads(response.data)
+        self.assertIn('not added', response_data['error'])
+
 
 if __name__ == '__main__':
     unittest.main()
