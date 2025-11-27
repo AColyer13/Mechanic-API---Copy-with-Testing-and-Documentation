@@ -124,7 +124,8 @@ Interactive documentation with “Try it out” for every endpoint.
 | PUT    | `/service-tickets/<id>/assign-mechanic/<mid>`     | Assign mechanic                 |
 | PUT    | `/service-tickets/<id>/remove-mechanic/<mid>`     | Remove mechanic                 |
 | PUT    | `/service-tickets/<id>/add-part/<pid>`            | Add part                        |
-| GET    | `/service-tickets/mechanic/<mid>`                 | Mechanic's tickets              |
+| POST   | `/service-tickets/<id>/parts`                     | Add multiple parts              |
+| PUT    | `/service-tickets/<id>/remove-part/<pid>`         | Remove part                     |
 
 ---
 

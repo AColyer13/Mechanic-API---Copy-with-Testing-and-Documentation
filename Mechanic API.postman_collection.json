@@ -464,6 +464,30 @@
 						},
 						"description": "Remove an inventory part from a service ticket (replace first 1 with ticket ID, second 1 with inventory part ID)"
 					}
+				},
+				{
+					"name": "Add Multiple Parts to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inventory_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/service-tickets/1/parts",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "5000",
+							"path": ["service-tickets", "1", "parts"]
+						},
+						"description": "Add multiple inventory parts to a service ticket in a single request (replace 1 with ticket ID, and update inventory_ids array)"
+					}
 				}
 			],
 			"description": "Service ticket management endpoints with mechanic assignment capabilities"

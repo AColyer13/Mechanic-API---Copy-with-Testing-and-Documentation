@@ -461,6 +461,44 @@ class TestServiceTicketEndpoints(BaseTestCase):
         response_data = json.loads(response.data)
         self.assertIn('not added', response_data['error'])
 
+    def test_add_multiple_parts_to_ticket(self):
+        """Test adding multiple inventory parts to a service ticket."""
+        customer = self.create_test_customer()
+        ticket = self.create_test_ticket(customer.id)
+        inventory1 = self.create_test_inventory('Part 1')
+        inventory2 = self.create_test_inventory('Part 2')
+        inventory3 = self.create_test_inventory('Part 3')
+        
+        # Add multiple parts
+        response = self.client.post(
+            f'/service-tickets/{ticket.id}/parts',
+            data=json.dumps({'inventory_ids': [inventory1.id, inventory2.id]}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn('Added 2 parts', response_data['message'])
+        self.assertEqual(len(response_data['added_parts']), 2)
+        self.assertEqual(response_data['already_added'], [])
+        
+        # Verify parts are added
+        ticket = ServiceTicket.query.get(ticket.id)
+        self.assertEqual(len(ticket.inventory_parts), 2)
+        
+        # Try to add again, should show already added
+        response = self.client.post(
+            f'/service-tickets/{ticket.id}/parts',
+            data=json.dumps({'inventory_ids': [inventory1.id, inventory3.id]}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn('Added 1 parts', response_data['message'])
+        self.assertEqual(len(response_data['added_parts']), 1)
+        self.assertEqual(response_data['already_added'], [inventory1.id])
+
 
 if __name__ == '__main__':
     unittest.main()

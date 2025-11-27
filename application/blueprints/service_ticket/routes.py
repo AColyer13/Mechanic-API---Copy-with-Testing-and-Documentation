@@ -612,3 +612,100 @@ def remove_part_from_ticket(ticket_id, inventory_id):
     except Exception as e:
         db.session.rollback()
         return {'error': 'An error occurred while removing the part'}, 500
+
+
+@service_ticket_bp.route('/<int:ticket_id>/parts', methods=['POST'])
+def add_multiple_parts_to_ticket(ticket_id):
+    """
+    Add multiple inventory parts to an existing service ticket
+    ---
+    tags:
+      - Service Tickets
+    summary: Add multiple parts to service ticket
+    description: Add multiple inventory parts to a service ticket in a single request
+    parameters:
+      - in: path
+        name: ticket_id
+        type: integer
+        required: true
+        description: The ID of the service ticket
+        example: 1
+      - in: body
+        name: body
+        required: true
+        description: List of inventory part IDs to add
+        schema:
+          type: object
+          required:
+            - inventory_ids
+          properties:
+            inventory_ids:
+              type: array
+              items:
+                type: integer
+              example: [1, 2, 3]
+    responses:
+      200:
+        description: Parts added successfully
+        schema:
+          properties:
+            message:
+              type: string
+              example: Added 2 parts to ticket 1
+            added_parts:
+              type: array
+              items:
+                type: integer
+              example: [1, 2]
+      400:
+        description: Invalid input data
+      404:
+        description: Service ticket or inventory part not found
+      409:
+        description: Some parts are already added to this ticket
+    """
+    try:
+        # Validate input
+        data = request.json
+        if not data or 'inventory_ids' not in data:
+            return {'error': 'inventory_ids is required'}, 400
+        
+        inventory_ids = data['inventory_ids']
+        if not isinstance(inventory_ids, list) or not all(isinstance(i, int) for i in inventory_ids):
+            return {'error': 'inventory_ids must be a list of integers'}, 400
+        
+        # Get ticket
+        ticket = ServiceTicket.query.get(ticket_id)
+        if not ticket:
+            return {'error': 'Service ticket not found'}, 404
+        
+        added_parts = []
+        already_added = []
+        
+        for inv_id in inventory_ids:
+            inventory_part = Inventory.query.get(inv_id)
+            if not inventory_part:
+                return {'error': f'Inventory part {inv_id} not found'}, 404
+            
+            if inventory_part in ticket.inventory_parts:
+                already_added.append(inv_id)
+            else:
+                ticket.inventory_parts.append(inventory_part)
+                added_parts.append(inv_id)
+        
+        if added_parts:
+            db.session.commit()
+        
+        message = f'Added {len(added_parts)} parts to ticket {ticket_id}'
+        if already_added:
+            message += f'. Parts already added: {already_added}'
+        
+        return {
+            'message': message,
+            'added_parts': added_parts,
+            'already_added': already_added
+        }, 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return {'error': 'An error occurred while adding the parts'}, 500
