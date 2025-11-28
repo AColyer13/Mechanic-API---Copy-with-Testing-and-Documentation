@@ -39,15 +39,41 @@ class CustomerSchema(SQLAlchemyAutoSchema):
             for key, value in data.items():
                 if isinstance(value, str) and key != 'password':
                     data[key] = value.strip()
-            
-            # Hash password if present
-            if 'password' in data and data['password']:
-                # Hash password using bcrypt
-                password_bytes = data['password'].encode('utf-8')
-                salt = bcrypt.gensalt()
-                hashed = bcrypt.hashpw(password_bytes, salt)
-                data['password'] = hashed.decode('utf-8')
+            # NOTE: do NOT hash the password here — validation must run on the
+            # raw password value (so length checks are enforced). Hashing is
+            # performed in a post_load hook after validation.
         
+        return data
+
+    @post_load
+    def hash_password(self, data, **kwargs):
+        """Hash password after validation/load so validators run on raw input.
+
+        The SQLAlchemyAutoSchema is configured with `load_instance=True`, so
+        `data` may be either a dict or a model instance. Handle both cases and
+        avoid double-hashing if the password already appears hashed.
+        """
+        # Helper to hash a raw password string
+        def _hash(raw_pw):
+            if not raw_pw:
+                return raw_pw
+            if isinstance(raw_pw, str) and raw_pw.startswith('$2'):
+                # Looks already like a bcrypt hash, skip
+                return raw_pw
+            pw_bytes = raw_pw.encode('utf-8')
+            hashed = bcrypt.hashpw(pw_bytes, bcrypt.gensalt())
+            return hashed.decode('utf-8')
+
+        # If SQLAlchemyAutoSchema returned a model instance
+        if not isinstance(data, dict):
+            if hasattr(data, 'password') and data.password:
+                data.password = _hash(data.password)
+            return data
+
+        # If we received a dict (rare with load_instance=True but handle it)
+        if 'password' in data and data['password']:
+            data['password'] = _hash(data['password'])
+
         return data
 
 
